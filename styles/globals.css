@@ -109,3 +109,10 @@
 .markdown ul li {
     margin: 10px 0;
 }
+
+.select-disable-arrow {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}

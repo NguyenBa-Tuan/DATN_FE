@@ -10,6 +10,7 @@ export const cartSlice = createSlice({
 		cartId: "",
 		token: STRAPI_API_TOKEN,
 		user: null,
+		listFavorite: [],
 	},
 	reducers: {
 		getToCart: (state, action) => {
@@ -24,7 +25,7 @@ export const cartSlice = createSlice({
 				item.count++;
 				item.attributes.price = item.oneQuantityPrice * item.count;
 			} else {
-				state.cartItems.push({ ...action.payload, quantity: 1 });
+				state.cartItems.push({ ...action.payload, count: 1 });
 			}
 		},
 		updateCart: (state, action) => {
@@ -63,6 +64,25 @@ export const cartSlice = createSlice({
 		setUser: (state, action) => {
 			state.user = action.payload;
 		},
+		setListFavorites: (state, action) => {
+			state.listFavorite = action.payload;
+		},
+		updateListFavorites: (state, action) => {
+			const item = state.listFavorite.find(
+				(p) => p.attributes.productId === action.payload
+			);
+			if (item) {
+				const data = state.listFavorite.filter((p) => {
+					return p.attributes.productId !== action.payload;
+				});
+				state.listFavorite = data;
+			} else {
+				const data = {
+					attributes: { productId: action.payload },
+				};
+				state.listFavorite.push(data);
+			}
+		},
 	},
 });
 
@@ -75,6 +95,8 @@ export const {
 	setListCategories,
 	setCardId,
 	setUser,
+	setListFavorites,
+	updateListFavorites,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

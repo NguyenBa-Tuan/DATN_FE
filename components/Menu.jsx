@@ -4,7 +4,7 @@ import { BsChevronDown } from "react-icons/bs";
 
 const data = [
 	{ id: 1, name: "Trang Chủ", url: "/" },
-	{ id: 3, name: "Danh Mục", subMenu: true },
+	{ id: 3, name: "Danh Mục Sản Phẩm", subMenu: true },
 ];
 
 const Menu = ({ showCatMenu, setShowCatMenu, categories }) => {

@@ -25,14 +25,14 @@ const register = () => {
 			const url = "http://localhost:1337/api/auth/local/register";
 			if (user.email && user.password && user.username) {
 				const res = await axios.post(url, user);
-				toast.success("Create successfully");
+				toast.success("Đăng kí thành công");
 				if (res) {
 					setUser(iniUser);
 					router.push("/login");
 				}
 			}
 		} catch (error) {
-			toast.error(error.message);
+			toast.error("Đăng kí thất bại");
 		}
 	};
 	return (
@@ -99,7 +99,7 @@ const register = () => {
 					</div>
 
 					<p className="mt-8 text-xs font-light text-center text-gray-700">
-						Bạn đã có tài khoản
+						Bạn đã có tài khoản?
 						<Link
 							href="/login"
 							className="font-medium text-purple-600 hover:underline"

@@ -3,7 +3,7 @@ import React from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { updateCart, removeFromCart } from "@/store/cartSlice";
 import { useDispatch } from "react-redux";
-import { userData } from "@/utils/helper";
+import { formatPound, userData } from "@/utils/helper";
 import axios from "axios";
 import { toast } from "react-toastify";
 const CartItem = ({ data }) => {
@@ -69,9 +69,9 @@ const CartItem = ({ data }) => {
 				user.id,
 				jwt
 			);
-			toast.success("delete successfully");
+			toast.success("Xóa thành công");
 		} catch (e) {
-			toast.error("error deleting");
+			toast.error("Lỗi khi xóa");
 		}
 	};
 
@@ -100,7 +100,7 @@ const CartItem = ({ data }) => {
 					</div>
 
 					<div className="text-sm md:text-md font-bold text-black/[0.5] mt-2">
-						MRP : {p.price} VND
+						MRP : {formatPound(p.price)} VND
 					</div>
 				</div>
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
 const iniUser = { password: "", identifier: "" };
@@ -12,6 +13,7 @@ const login = () => {
 	const [user, setUser] = useState(iniUser);
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const router = useRouter();
+	const dispatch = useDispatch();
 
 	const handleChange = ({ target }) => {
 		const { name, value } = target;
@@ -28,13 +30,14 @@ const login = () => {
 				const { data } = await axios.post(url, user);
 				if (data.jwt) {
 					storeUser(data);
-					toast.success("login successfully");
+					// dispatch(setUser({ ...data }));
+					toast.success("Đăng nhập thành công");
 					setUser(iniUser);
-					router.push("/");
+					router.back();
 				}
 			}
 		} catch (err) {
-			toast.error(err.message);
+			toast.error("Lỗi đăng nhập");
 		}
 	};
 	return (
@@ -92,7 +95,7 @@ const login = () => {
 					</div>
 
 					<p className="mt-8 text-xs font-light text-center text-gray-700">
-						Bạn không có tài khoản
+						Bạn không có tài khoản?
 						<Link
 							href="/register"
 							className="font-medium text-purple-600 hover:underline"

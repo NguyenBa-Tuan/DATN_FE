@@ -1,27 +1,37 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { IoMdHeartEmpty } from "react-icons/io";
 import Wrapper from "@/components/Wrapper";
 import ProductDetailsCarousel from "@/components/ProductDetailsCarousel";
 import RelatedProducts from "@/components/RelatedProducts";
 import { fetchDataFromApi } from "@/utils/api";
-import { getDiscountedPricePercentage, userData } from "@/utils/helper";
+import {
+	formatPound,
+	getDiscountedPricePercentage,
+	userData,
+} from "@/utils/helper";
 import ReactMarkdown from "react-markdown";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart } from "@/store/cartSlice";
+import { addToCart, updateListFavorites } from "@/store/cartSlice";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
 import axios from "axios";
 import _ from "lodash";
+import { STRAPI_API_TOKEN } from "@/utils/urls";
+import Image from "next/image";
+import CommentSection from "@/components/CommentSection";
 
 const ProductDetails = ({ product, products }) => {
 	const [selectedSize, setSelectedSize] = useState();
 	const [showError, setShowError] = useState(false);
+	const [favorite, setFavorite] = useState(false);
 	const dispatch = useDispatch();
 	const p = product?.data?.[0]?.attributes;
 	const router = useRouter();
 	const { cartItems } = useSelector((state) => state.cart);
+	const [user, setUser] = useState();
+	const [jwt, setJwt] = useState();
 
 	const addProductApi = async (dataPayload, userId, jwt) => {
 		const url = `http://localhost:1337/api/cards/user/${userId}`;
@@ -98,13 +108,68 @@ const ProductDetails = ({ product, products }) => {
 		}
 	}, [dispatch, p.price, product?.data, selectedSize, cartItems]);
 
+	useEffect(() => {
+		(async () => {
+			const { user, jwt } = userData();
+			setJwt(jwt);
+			setUser(user);
+			if (user?.id) {
+				const url = `http://localhost:1337/api/favorite-products?filters[userId]=${user.id}&filters[productId]=${product.data[0].id}`;
+				const config = {
+					headers: {
+						Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+					},
+				};
+				const { data } = await axios.get(url, config);
+				if (data.data.length > 0) setFavorite(true);
+			}
+		})();
+	}, []);
+
+	const handleAddToFavorite = () => {
+		const { user } = userData();
+		if (user?.id === undefined || user?.id === null) {
+			router.push("/login");
+		} else {
+			(async () => {
+				const config = {
+					headers: {
+						Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+					},
+				};
+				const url = `http://localhost:1337/api/favorite-products/put/`;
+				const data = {
+					userId: user.id,
+					productId: product.data[0].id,
+				};
+				await axios.put(url, data, config);
+				setFavorite((prev) => !prev);
+				dispatch(updateListFavorites(p.id));
+			})();
+		}
+	};
+
 	return (
 		<div className="w-full md:py-20">
 			<ToastContainer />
 			<Wrapper>
 				<div className="flex flex-col lg:flex-row md:px-10 gap-[50px] lg:gap-[100px]">
 					<div className="w-full md:w-auto flex-[1.5] max-w-[500px] lg:max-w-full mx-auto lg:mx-0">
-						<ProductDetailsCarousel images={p.image.data} />
+						{p.image.data ? (
+							<ProductDetailsCarousel images={p.image.data} />
+						) : (
+							p.thumbnail.data.attributes.url && (
+								<Image
+									width={671}
+									height={537}
+									src={
+										"http://localhost:1337" +
+										p.thumbnail.data.attributes.url
+									}
+									alt={p.thumbnail.data.attributes.url}
+								/>
+							)
+						)}
 					</div>
 
 					<div className="flex-[1] py-3">
@@ -118,19 +183,24 @@ const ProductDetails = ({ product, products }) => {
 
 						<div className="flex items-center">
 							<p className="mr-2 text-lg font-semibold">
-								MRP : {p.price} VND
+								MRP : {formatPound(p.price)} VND
 							</p>
 							{p.original_price && (
 								<>
-									<p className="text-base  font-medium line-through">
-										{p.original_price} VND
-									</p>
+									{p.original_price > p.price && (
+										<p className="text-base  font-medium line-through">
+											{formatPound(p.original_price)} VND
+										</p>
+									)}
 									<p className="ml-auto text-base font-medium text-green-500">
-										{getDiscountedPricePercentage(
-											p.original_price,
-											p.price
-										)}
-										% off
+										Giảm -
+										{p.original_price > p.price
+											? getDiscountedPricePercentage(
+													p.original_price,
+													p.price
+											  )
+											: "0"}
+										%
 									</p>
 								</>
 							)}
@@ -189,9 +259,15 @@ const ProductDetails = ({ product, products }) => {
 						>
 							Thêm vào giỏ hàng
 						</button>
-						<button className="w-full py-4 rounded-full border border-black text-lg font-medium transition-transform active:scale-95 flex items-center justify-center gap-2 hover:opacity-75 mb-10">
-							Yêu thích
-							<IoMdHeartEmpty size={20} />
+						<button
+							className="w-full py-4 rounded-full border border-black text-lg font-medium transition-transform active:scale-95 flex items-center justify-center gap-2 hover:opacity-75 mb-10"
+							onClick={handleAddToFavorite}
+						>
+							{favorite ? "Hủy yêu thích" : "Yêu thích"}
+							<IoMdHeartEmpty
+								size={20}
+								fill={favorite && "red"}
+							/>
 						</button>
 
 						<div>
@@ -204,7 +280,11 @@ const ProductDetails = ({ product, products }) => {
 						</div>
 					</div>
 				</div>
-
+				<CommentSection
+					pId={product?.data?.[0]?.id}
+					user={user}
+					jwt={jwt}
+				/>
 				<RelatedProducts products={products} />
 			</Wrapper>
 		</div>

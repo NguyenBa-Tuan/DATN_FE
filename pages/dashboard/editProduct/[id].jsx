@@ -53,19 +53,21 @@ const editProduct = () => {
 			};
 
 			await axios.put(url, data, config);
-			toast.success("Update product successfully");
+			toast.success("Cập nhật thành công");
 		} catch (e) {
-			toast.error(e.message);
+			toast.error("Lỗi cập nhật");
 		}
 	};
 	return (
 		<Sidebar>
-			<div className="flex justify-between p-4">
+			{/* <div className="flex justify-between p-4">
 				<h2>Customers</h2>
 				<h2>Welcome Back, Clint</h2>
-			</div>
+			</div> */}
 			<div>
-				<h1 className="text-center text-3xl mb-[3rem]">Edit product</h1>
+				<h1 className="text-center text-3xl mb-[3rem]">
+					Chỉnh sửa sản phẩm
+				</h1>
 				<FormProduct dataProduct={dataProduct} onSubmit={onSubmit} />
 			</div>
 		</Sidebar>

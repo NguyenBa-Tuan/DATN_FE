@@ -65,20 +65,22 @@ const addProduct = () => {
 				},
 			};
 			await axios.post(url, data, config);
-			toast.success("Add product successfully");
+			toast.success("Thêm sản phẩm thành công");
 		} catch (e) {
-			toast.error(e.message);
+			toast.error("Lỗi thêm sản phẩm");
 		}
 	};
 
 	return (
 		<Sidebar>
-			<div className="flex justify-between p-4">
+			{/* <div className="flex justify-between p-4">
 				<h2>Customers</h2>
 				<h2>Welcome Back, Clint</h2>
-			</div>
+			</div> */}
 			<div>
-				<h1 className="text-center text-3xl mb-[3rem]">Add product</h1>
+				<h1 className="text-center text-3xl mb-[3rem]">
+					Thêm mới sản phẩm
+				</h1>
 				<FormProduct onSubmit={onSubmit} />
 			</div>
 		</Sidebar>

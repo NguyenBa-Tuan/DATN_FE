@@ -47,7 +47,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 				setListSize(dataListSize);
 				setFormError();
 			} else {
-				toast.error("add size error");
+				toast.error("Lỗi thêm size");
 			}
 		}
 	};
@@ -90,9 +90,9 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 		e.preventDefault();
 		try {
 			if (listSize.length === 0) {
-				setFormError("List size is required");
+				setFormError("Yêu cầu nhập size");
 			} else if (!image) {
-				setFormError("Image is required");
+				setFormError("Yêu cầu nhập ảnh");
 			} else {
 				setFormError();
 			}
@@ -100,7 +100,10 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			if (listSize.length > 0 && image) {
 				await onSubmit(e, image, listSize);
 				e.target.reset();
-				setImage(null);
+				if (!dataProduct) {
+					setImage(null);
+					setListSize([]);
+				}
 			}
 		} catch (err) {}
 	};
@@ -110,7 +113,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			<div className="flex flex-wrap -mx-3 mb-6">
 				<div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Name
+						Tên
 					</label>
 					<input
 						className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -124,7 +127,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 				</div>
 				<div className="w-full md:w-1/2 px-3">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Subtitle
+						Tên phụ
 					</label>
 					<input
 						className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -140,7 +143,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			<div className="flex flex-wrap -mx-3 mb-6">
 				<div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Price
+						Giá
 					</label>
 					<input
 						className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -154,7 +157,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 				</div>
 				<div className="w-full md:w-1/2 px-3">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Original price
+						Giá gốc
 					</label>
 					<input
 						className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -170,7 +173,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			<div className="flex flex-wrap -mx-3 mb-6">
 				<div className="w-full px-3">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Description
+						Mô tả
 					</label>
 					<textarea
 						className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -186,7 +189,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			<div className="flex flex-wrap -mx-3 mb-6">
 				<div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
 					<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Categories
+						Danh mục sản phẩm
 					</label>
 					<div className="relative">
 						<select
@@ -223,12 +226,12 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			</div>
 			<div className="w-full mb-6">
 				<label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-					Size
+					Kích cỡ
 				</label>
 				<div className="-mr-6 -ml-3">
 					<div className="flex">
 						<label className="w-full md:w-1/3 px-3 mb-6 md:mb-0 flex items-center">
-							Name:
+							Tên kích cỡ:
 							<input
 								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 								type="text"
@@ -238,7 +241,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 							/>
 						</label>
 						<label className="w-full md:w-1/3 px-3 mb-6 md:mb-0 flex items-center">
-							Stock:
+							Số lượng:
 							<input
 								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 								name="stock"
@@ -252,12 +255,14 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 							onClick={onClickAddSize}
 						>
 							<FaPlus className="inline mr-3" />
-							Add
+							Thêm
 						</div>
 					</div>
 					{listSize.length > 0 && (
 						<div className="w-full px-3 mb-6 md:mb-0 flex">
-							<p className="whitespace-nowrap">List size</p>
+							<p className="whitespace-nowrap">
+								Danh sách kích cỡ và số lượng
+							</p>
 							<ul className="pl-5 w-full">
 								{listSize.map((item, index) => {
 									return (
@@ -266,8 +271,10 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 											className="flex justify-between items-center w-full"
 										>
 											<div className="grid grid-cols-2 w-full">
-												<div>Name: {item.name}</div>
-												<div>stock: {item.stock}</div>
+												<div>Tên size: {item.name}</div>
+												<div>
+													Số lượng: {item.stock}
+												</div>
 											</div>
 											<FaRegWindowClose
 												className="cursor-pointer"
@@ -286,7 +293,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			<div className="flex flex-wrap -mx-3 mb-6">
 				<div className="w-full px-3 ">
 					<span className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-						Image
+						Hình ảnh
 					</span>
 					<div className="flex">
 						{image ? (
@@ -323,7 +330,7 @@ const FormProduct = ({ dataProduct, onSubmit }) => {
 			)}
 			<div className="flex justify-center">
 				<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded flex items-center">
-					Submit
+					Cập nhật
 				</button>
 			</div>
 		</form>

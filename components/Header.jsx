@@ -1,10 +1,4 @@
-import React, {
-	useState,
-	useEffect,
-	useReducer,
-	useCallback,
-	useMemo,
-} from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import Wrapper from "./Wrapper";
 
 import Link from "next/link";
@@ -17,12 +11,16 @@ import { BiMenuAltRight } from "react-icons/bi";
 import { VscChromeClose } from "react-icons/vsc";
 import { fetchDataFromApi } from "@/utils/api";
 import { useDispatch, useSelector } from "react-redux";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaChevronDown } from "react-icons/fa";
 import { userData } from "@/utils/helper";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { getToCart, setCardId, setListCategories } from "@/store/cartSlice";
-import { STRAPI_API_TOKEN } from "@/utils/urls";
+import {
+	getToCart,
+	setCardId,
+	setListCategories,
+	setListFavorites,
+} from "@/store/cartSlice";
 
 const Header = () => {
 	const [mobileMenu, setMobileMenu] = useState(false);
@@ -31,10 +29,15 @@ const Header = () => {
 	const [lastScrollY, setLastScrollY] = useState(0);
 	const [categories, setCategories] = useState(null);
 	const [user, setUser] = useState();
+	const [showUserDropdown, setShowUserDropdown] = useReducer(
+		(prev) => !prev,
+		false
+	);
+	const router = useRouter();
 
 	const dispatch = useDispatch();
 
-	const { cartItems } = useSelector((state) => state.cart);
+	const { cartItems, listFavorite } = useSelector((state) => state.cart);
 
 	const controlNavbar = () => {
 		if (window.scrollY > 200) {
@@ -97,20 +100,25 @@ const Header = () => {
 		dispatch(setCardId(data5));
 	};
 
+	const getListFavorites = async (user, jwt) => {
+		const config = {
+			headers: { Authorization: `Bearer ${jwt}` },
+		};
+
+		const url = `http://localhost:1337/api/favorite-products?[filters][userId]=${user.id}`;
+		const { data } = await axios.get(url, { ...config });
+		dispatch(setListFavorites(data.data));
+	};
+
 	useEffect(() => {
 		const { user, jwt } = userData();
 		setUser(user);
 		fetchCategories();
 		if (user) {
+			getListFavorites(user, jwt);
 			getCartApi(user, jwt);
 		}
-	}, [dispatch]);
-
-	const [showUserDropdown, setShowUserDropdown] = useReducer(
-		(prev) => !prev,
-		false
-	);
-	const router = useRouter();
+	}, [dispatch, router]);
 
 	const logout = useCallback(() => {
 		localStorage.setItem("user", "");
@@ -144,28 +152,6 @@ const Header = () => {
 				)}
 
 				<div className="flex items-center gap-2 text-black">
-					{/* Icon start */}
-					<div className="w-8 md:w-12 h-8 md:h-12 rounded-full flex justify-center items-center hover:bg-black/[0.05] cursor-pointer relative">
-						<IoMdHeartEmpty className="text-[19px] md:text-[24px]" />
-						<div className="h-[14px] md:h-[18px] min-w-[14px] md:min-w-[18px] rounded-full bg-red-600 absolute top-1 left-5 md:left-7 text-white text-[10px] md:text-[12px] flex justify-center items-center px-[2px] md:px-[5px]">
-							51
-						</div>
-					</div>
-					{/* Icon end */}
-
-					{/* Icon start */}
-					<Link href="/cart">
-						<div className="w-8 md:w-12 h-8 md:h-12 rounded-full flex justify-center items-center hover:bg-black/[0.05] cursor-pointer relative">
-							<BsCart className="text-[15px] md:text-[20px]" />
-							{cartItems?.length > 0 && (
-								<div className="h-[14px] md:h-[18px] min-w-[14px] md:min-w-[18px] rounded-full bg-red-600 absolute top-1 left-5 md:left-7 text-white text-[10px] md:text-[12px] flex justify-center items-center px-[2px] md:px-[5px]">
-									{cartItems.length}
-								</div>
-							)}
-						</div>
-					</Link>
-					{/* Icon end */}
-
 					{/* Mobile icon start */}
 					<div className="w-8 md:w-12 h-8 md:h-12 rounded-full flex md:hidden justify-center items-center hover:bg-black/[0.05] cursor-pointer relative -mr-2">
 						{mobileMenu ? (
@@ -182,44 +168,84 @@ const Header = () => {
 					</div>
 					{/* Mobile icon end */}
 					{user?.username ? (
-						<div className="flex gap-2 relative">
-							<p className="font-medium text-black">
-								{user.username}
-							</p>
-							<button onClick={setShowUserDropdown}>
-								<FaUserCircle className="text-[24px]" />
-							</button>
-							{showUserDropdown && (
-								<div className="absolute text-base float-left py-2 list-none text-left rounded shadow-lg mt-1 z-[99999] bg-white min-w-[150px] top-[110%] right-0">
-									<Link
-										className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200"
-										href={"/profile"}
-									>
-										Profile
-									</Link>
-									<div
-										className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200 cursor-pointer"
-										onClick={logout}
-									>
-										Logout
+						<>
+							{/* Icon start */}
+							<Link href="/favorite">
+								<div className="w-8 md:w-12 h-8 md:h-12 rounded-full flex justify-center items-center hover:bg-black/[0.05] cursor-pointer relative">
+									<IoMdHeartEmpty className="text-[19px] md:text-[24px]" />
+									<div className="h-[14px] md:h-[18px] min-w-[14px] md:min-w-[18px] rounded-full bg-red-600 absolute top-1 left-5 md:left-7 text-white text-[10px] md:text-[12px] flex justify-center items-center px-[2px] md:px-[5px]">
+										{listFavorite?.length || 0}
 									</div>
 								</div>
-							)}
-						</div>
+							</Link>
+							{/* Icon end */}
+
+							{/* Icon start */}
+							<Link href="/cart">
+								<div className="w-8 md:w-12 h-8 md:h-12 rounded-full flex justify-center items-center hover:bg-black/[0.05] cursor-pointer relative">
+									<BsCart className="text-[15px] md:text-[20px]" />
+									{cartItems?.length > 0 && (
+										<div className="h-[14px] md:h-[18px] min-w-[14px] md:min-w-[18px] rounded-full bg-red-600 absolute top-1 left-5 md:left-7 text-white text-[10px] md:text-[12px] flex justify-center items-center px-[2px] md:px-[5px]">
+											{cartItems.length}
+										</div>
+									)}
+								</div>
+							</Link>
+							{/* Icon end */}
+							<div className="flex gap-2 relative">
+								<p className="font-medium text-black">
+									{user.username}
+								</p>
+								<FaUserCircle className="text-[24px]" />
+								<button onClick={setShowUserDropdown}>
+									<FaChevronDown />
+								</button>
+								{showUserDropdown && (
+									<div className="absolute text-base float-left py-2 list-none text-left rounded shadow-lg mt-1 z-[99999] bg-white min-w-[150px] top-[110%] right-0">
+										{user.userRole === "admin" && (
+											<Link
+												className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200"
+												href={"/dashboard"}
+											>
+												Trang quản lý
+											</Link>
+										)}
+										<Link
+											className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200"
+											href={"/profile"}
+										>
+											Trang thông tin
+										</Link>
+										<Link
+											className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200"
+											href={"/orderHistory"}
+										>
+											Lịch sử mua hàng
+										</Link>
+										<div
+											className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent hover:bg-slate-200 cursor-pointer"
+											onClick={logout}
+										>
+											Đăng xuất
+										</div>
+									</div>
+								)}
+							</div>
+						</>
 					) : (
 						<>
 							<Link
 								class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
 								href={"/login"}
 							>
-								Login
+								Đăng nhập
 							</Link>
 
 							<Link
 								class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
 								href={"/register"}
 							>
-								Register
+								Đăng kí
 							</Link>
 						</>
 					)}

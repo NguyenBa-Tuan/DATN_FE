@@ -4,20 +4,16 @@ import Wrapper from "@/components/Wrapper";
 import { fetchDataFromApi } from "@/utils/api";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-const maxResult = 1;
+const maxResult = 9;
 
 const category = ({ category, products, slug }) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const [pageIndex, setPageIndex] = useState(1);
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { query } = useRouter();
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		setPageIndex(1);
 	}, [query]);
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { data, error, isLoading } = useSWR(
 		`/api/products?populate=*&[filters][categories][slug][$eq]=${slug}&pagination[page]=${pageIndex}&pagination[pageSize]=${maxResult}`,
 		fetchDataFromApi,
@@ -34,7 +30,7 @@ const category = ({ category, products, slug }) => {
 					</div>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 my-14 px-5 md:px-0">
-					{products?.data?.map((product) => (
+					{data?.data?.map((product) => (
 						<ProductCard key={product?.id} data={product} />
 					))}
 				</div>
