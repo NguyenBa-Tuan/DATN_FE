@@ -108,6 +108,18 @@ const ProductDetails = ({ product, products }) => {
 		}
 	}, [dispatch, p.price, product?.data, selectedSize, cartItems]);
 
+	const getProduct = async () => {
+		try {
+			const product = await fetchDataFromApi(
+				`/api/products?populate=*&filters[slug][$eq]=${slug}`
+			);
+			console.log(
+				"🚀 ~ file: [slug].js:116 ~ getProduct ~ product:",
+				product
+			);
+		} catch (err) {}
+	};
+
 	useEffect(() => {
 		(async () => {
 			const { user, jwt } = userData();
@@ -124,6 +136,7 @@ const ProductDetails = ({ product, products }) => {
 				if (data.data.length > 0) setFavorite(true);
 			}
 		})();
+		getProduct();
 	}, []);
 
 	const handleAddToFavorite = () => {
@@ -294,10 +307,12 @@ const ProductDetails = ({ product, products }) => {
 export default ProductDetails;
 
 export async function getStaticPaths() {
-	const products = await fetchDataFromApi("/api/products?populate=*");
+	const products = await fetchDataFromApi(
+		"/api/products?populate=*&pagination[pageSize]=100"
+	);
 	const paths = products?.data?.map((p) => ({
 		params: {
-			slug: p.attributes.slug || "",
+			slug: String(p.attributes.slug),
 		},
 	}));
 

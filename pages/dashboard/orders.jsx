@@ -13,7 +13,8 @@ const orders = () => {
 	const [orderData, setOrderData] = useState();
 	const getListOrder = async () => {
 		try {
-			const url = "http://localhost:1337/api/orders?populate=*";
+			const url =
+				"http://localhost:1337/api/orders?populate=*&sort[0][createdAt]=desc";
 			const { user, jwt } = userData();
 			if (user && jwt) {
 				const config = {
@@ -64,7 +65,7 @@ const orders = () => {
 
 	const onChangeFilterOrder = async (e) => {
 		try {
-			const url = `http://localhost:1337/api/orders?populate=*${
+			const url = `http://localhost:1337/api/orders?populate=*&sort[0][createdAt]=desc${
 				e.target.value !== "" && "&[filters][status]=" + e.target.value
 			}`;
 			const { user, jwt } = userData();

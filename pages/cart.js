@@ -91,7 +91,31 @@ const Cart = () => {
 			}
 			dispatch(getToCart([]));
 			setLoading(false);
-			toast.success("Payment successfully");
+			cartItems.map((item) => {
+				const data = item.attributes.sizes.map((size) => {
+					if (size.name === item.size) {
+						return {
+							stock: size.stock - item.count,
+							sizeId: size.id,
+						};
+					}
+				});
+				data.forEach((element) => {
+					if (element) {
+						const dataSize = {
+							data: {
+								stock: element.stock,
+							},
+						};
+						axios.put(
+							`http://localhost:1337/api/size/${element.sizeId}`,
+							dataSize,
+							config
+						);
+					}
+				});
+			});
+			toast.success("Đặt hàng thành công");
 			router.push("/success");
 		} catch (e) {
 			setLoading(false);

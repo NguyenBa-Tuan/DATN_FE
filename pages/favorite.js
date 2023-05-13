@@ -27,7 +27,7 @@ const favorite = () => {
 
 	const getListProducts = async () => {
 		try {
-			const url = `http://localhost:1337/api/products?populate=*`;
+			const url = `http://localhost:1337/api/products?populate=*&pagination[pageSize]=100`;
 			const { data } = await axios.get(url);
 			let listPrd = [];
 			data?.data.map((item) => {

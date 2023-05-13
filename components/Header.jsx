@@ -6,7 +6,7 @@ import Menu from "./Menu";
 import MenuMobile from "./MenuMobile";
 
 import { IoMdHeartEmpty } from "react-icons/io";
-import { BsCart } from "react-icons/bs";
+import { BsCart, BsSearch } from "react-icons/bs";
 import { BiMenuAltRight } from "react-icons/bi";
 import { VscChromeClose } from "react-icons/vsc";
 import { fetchDataFromApi } from "@/utils/api";
@@ -34,6 +34,7 @@ const Header = () => {
 		false
 	);
 	const router = useRouter();
+	const { asPath } = useRouter();
 
 	const dispatch = useDispatch();
 
@@ -84,7 +85,7 @@ const Header = () => {
 			];
 		});
 
-		const url3 = `http://localhost:1337/api/products?populate=*`;
+		const url3 = `http://localhost:1337/api/products?populate=*&pagination[pageSize]=100`;
 		const data3 = await axios.get(url3, { ...config });
 		let data5 = [];
 
@@ -127,6 +128,19 @@ const Header = () => {
 		dispatch(getToCart([]));
 	}, [router]);
 
+	const onSearch = (e) => {
+		e.preventDefault();
+		if (e.target.search.value !== "") {
+			if (asPath.includes("category")) {
+				router.push(
+					`${asPath.split("?")[0]}/?search=${e.target.search.value}`
+				);
+			} else {
+				router.push(`/?search=${e.target.search.value}`);
+			}
+		}
+	};
+
 	return (
 		<header
 			className={`w-full h-[50px] md:h-[80px] bg-white flex items-center justify-between z-20 sticky top-0 transition-transform duration-300 ${show}`}
@@ -167,6 +181,17 @@ const Header = () => {
 						)}
 					</div>
 					{/* Mobile icon end */}
+					<form className="flex relative" onSubmit={onSearch}>
+						<input
+							type="text"
+							className="block w-full px-4 py-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+							placeholder="Tìm kiếm sản phẩm..."
+							name="search"
+						/>
+						<button className="absolute top-4 right-2">
+							<BsSearch className="" />
+						</button>
+					</form>
 					{user?.username ? (
 						<>
 							{/* Icon start */}

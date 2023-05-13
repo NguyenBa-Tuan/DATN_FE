@@ -1,8 +1,9 @@
 import Wrapper from "@/components/Wrapper";
+import { userData } from "@/utils/helper";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const iniUser = { password: "", email: "", username: "" };
@@ -35,6 +36,13 @@ const register = () => {
 			toast.error("Đăng kí thất bại");
 		}
 	};
+
+	useEffect(() => {
+		const { user } = userData();
+		if (user) {
+			router.push("/");
+		}
+	});
 	return (
 		<Wrapper>
 			<div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
