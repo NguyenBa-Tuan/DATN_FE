@@ -21,9 +21,9 @@ const TopCards = (data) => {
 					</p>
 					<p className="text-gray-600">Danh thu tháng</p>
 				</div>
-				<p className="bg-green-200 flex justify-center items-center p-2 rounded-lg">
+				{/* <p className="bg-green-200 flex justify-center items-center p-2 rounded-lg">
 					<span className="text-green-700 text-lg">+11%</span>
-				</p>
+				</p> */}
 			</div>
 			<div className="bg-white flex justify-between w-full border p-4 rounded-lg">
 				<div className="flex flex-col w-full pb-4">
@@ -36,9 +36,9 @@ const TopCards = (data) => {
 						Số lượng đơn hàng trong tháng
 					</p>
 				</div>
-				<p className="bg-green-200 flex justify-center items-center p-2 rounded-lg">
+				{/* <p className="bg-green-200 flex justify-center items-center p-2 rounded-lg">
 					<span className="text-green-700 text-lg">+17%</span>
-				</p>
+				</p> */}
 			</div>
 		</div>
 	);

@@ -298,13 +298,13 @@ const orders = () => {
 													: "Thẻ"}
 											</p>
 											<div className="flex gap-5">
-												<div
+												{/* <div
 													onClick={() =>
 														onDeleteOrder(item.id)
 													}
 												>
 													<BsFillTrash3Fill />
-												</div>
+												</div> */}
 											</div>
 										</div>
 									</li>

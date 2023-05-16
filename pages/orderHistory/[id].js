@@ -110,7 +110,7 @@ const OrderHistoryDetail = () => {
 							Tổng tiền
 						</div>
 						<div className="text-md md:text-lg font-medium text-black">
-							{orderData?.attributes?.totalPrice} VND
+							{formatPound(orderData?.attributes?.totalPrice)} VND
 						</div>
 					</div>
 					<div className="w-full mx-auto max-w-5xl p-0 mt-4">
